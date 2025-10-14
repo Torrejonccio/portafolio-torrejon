@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\Web Apps\\PortafolioTorrejon\\PortafolioTorrejon.csproj": {}
+    "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\repos\\portafolio-torrejon\\PortafolioTorrejon.csproj": {}
   },
   "projects": {
-    "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\Web Apps\\PortafolioTorrejon\\PortafolioTorrejon.csproj": {
+    "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\repos\\portafolio-torrejon\\PortafolioTorrejon.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\Web Apps\\PortafolioTorrejon\\PortafolioTorrejon.csproj",
+        "projectUniqueName": "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\repos\\portafolio-torrejon\\PortafolioTorrejon.csproj",
         "projectName": "PortafolioTorrejon",
-        "projectPath": "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\Web Apps\\PortafolioTorrejon\\PortafolioTorrejon.csproj",
+        "projectPath": "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\repos\\portafolio-torrejon\\PortafolioTorrejon.csproj",
         "packagesPath": "C:\\Users\\Matia\\.nuget\\packages\\",
-        "outputPath": "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\Web Apps\\PortafolioTorrejon\\obj\\",
+        "outputPath": "E:\\COSAS\\VISUAL PERSONAL\\PROYECTOS ASP.NET\\repos\\portafolio-torrejon\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Matia\\AppData\\Roaming\\NuGet\\NuGet.Config"

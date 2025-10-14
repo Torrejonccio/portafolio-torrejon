@@ -11,7 +11,7 @@
             Proveo apps web de servicios para optimizar, mejorar, y sacarle el máximo provecho a tu negocio !!<br>Servicios especializados en sistemas de gestión interna/externa, portales varios de clientes y automatización de procesos !!
             <br>Portales y sistemas visualmente agradables, intuitivos, y muy simples de utilizar !!  
         </p>
-        <a href="#contacto" class="btn btn-primary btn-lg mt-3">Contáctame (xfa)</a>
+        <a href="#contacto" class="btn btn-primary btn-lg mt-3">Contáctame</a>
     </div>
 </section>
 
@@ -100,9 +100,9 @@ Me interesa la gestión de soluciones tecnológicas adaptadas a distintas necesi
 Tengo experiencia en la <b>ejecución de proyectos</b> en entornos industriales y empresariales, desarrollando soluciones en <b>automatización, monitoreo y control de datos</b>. También he realizado <b>consultoría tecnológica a PYMEs</b>, apoyando la integración de <b>herramientas tecnológicas</b> en sus operaciones.
 </p>
                 <h5 class="fw-bold mt-4">Objetivo</h5>
-                <del>Mi objetivo actual es intentar borrar a ese caballero asomado sobre <b>mi</b> hombro derecho</del>
+                <del>Actualmente es intentar borrar a ese caballero asomado sobre <b>mi</b> hombro derecho</del>
                 <p>Busco ayudar a las personas y pequeñas/medianas empresas simplificando, optimizando y automatizando las operaciones de su negocio, potenciando este a través de tecnologías robustas y adaptadas a sus propias necesidades.
-                <br> Mi prioridad es lograr que las soluciones y herramientas entregadas sean tan efectivas como sencillas de utilizar. El enfoque siempre será proveer la mejor experiencia de usuario</p>
+                <br>Mi prioridad es lograr que las soluciones y herramientas entregadas sean tan efectivas como sencillas de utilizar. El enfoque siempre será proveer la mejor experiencia de usuario</p>
             </div>
         </div>
     </div>
@@ -129,7 +129,7 @@ Tengo experiencia en la <b>ejecución de proyectos</b> en entornos industriales 
                     </div>
                     <div class="form-floating mb-3">
                         <textarea class="form-control" placeholder="" id="mensaje" style="height: 150px" required></textarea>
-                        <label for="mensaje">Escriba su <del>declaración de amor incondicional</del> mensaje aquí</label>
+                        <label for="mensaje">Escriba su <del>carta de amor</del> mensaje</label>
                     </div>
                     <div class="d-grid">
                         <button class="btn btn-primary btn-lg" type="submit"><del>Intentar</del> Enviar mensaje</button>
@@ -148,6 +148,10 @@ Tengo experiencia en la <b>ejecución de proyectos</b> en entornos industriales 
             <h2 class="fw-bold">RASPA Y GANA... MI WHATSAPP Y CORREO !!!</h2>
             <p class="text-muted">No sé que más colocar así que toma un jueguito:<br>Raspa los cuadrados y encuentra los pares de íconos para revelar la información !!</p>
             EVITA LAS SEÑALES DE PELIGRO <i class="bi bi-exclamation-triangle-fill"></i>, SI ACUMULAS 2 PIERDES
+        </div>
+
+        <div class="text-center mb-4">
+            <button id="skip-game-button" class="btn btn-sm btn-outline-secondary">Si no estás de ánimo para juegos, haz clic aquí</button>
         </div>
 
         <!-- Contenedor para los resultados -->
@@ -192,6 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const countdownElement = document.getElementById('countdown');
     const loseResultElement = document.getElementById('lose-result');
     const retryButton = document.getElementById('retry-button');
+    const skipButton = document.getElementById('skip-game-button');
 
     let revealedItems = { 'whatsapp': 0, 'email': 0, 'bomb': 0 };
     let gameActive = true;
@@ -344,10 +349,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1000);
     }
 
+    function endGame() {
+        gameActive = false;
+        skipButton.style.display = 'none';
+    }
+
     retryButton.addEventListener('click', () => {
         loseModal.hide();
         setupGame();
     });
+
+    skipButton.addEventListener('click', () => {
+        if (!gameActive) return;
+        winGame('whatsapp');
+        winGame('email');
+        endGame();
+        
+        document.querySelectorAll('.grid-item canvas').forEach(canvas => {
+            canvas.style.opacity = '0';
+        });
+    });
+
+
 
     setupGame();
 });
