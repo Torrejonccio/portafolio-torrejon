@@ -118,7 +118,6 @@ E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\n
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\scopedcss\bundle\PortafolioTorrejon.styles.css
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\scopedcss\projectbundle\PortafolioTorrejon.bundle.scp.css
-E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\compressed\usqbk2y2lh-7n0abh94b1.gz
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\compressed\plv67ubncr-61n19gt1b8.gz
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\compressed\yevwme34yf-xtxxf3hu2r.gz
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\compressed\zehvctiex2-bqjiyaj88i.gz
@@ -191,3 +190,4 @@ E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\n
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\PortafolioTorrejon.pdb
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\PortafolioTorrejon.genruntimeconfig.cache
 E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\repos\portafolio-torrejon\obj\Debug\net9.0\ref\PortafolioTorrejon.dll
+E:\COSAS\VISUAL PERSONAL\PROYECTOS ASP.NET\Repos\portafolio-torrejon\obj\Debug\net9.0\compressed\usqbk2y2lh-saznertrqt.gz
