@@ -1,717 +1,527 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Demo: Gesti&#xF3;n de Activos</title>
-    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>Demo activos</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        .demo-container { max-width: 1600px; margin: auto; }
+        #map { height: 550px; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07); }
+        .table-responsive { max-height: 550px; }
+        .nav-tabs .nav-link { font-weight: 500; color: #5b20a3; }
+        .nav-tabs .nav-link.active { background-color: #f9fafb; border-bottom-color: #f9fafb; }
+        .tab-content { background-color: #f9fafb; border: 1px solid #dee2e6; border-top: none; padding: 2rem; border-radius: 0 0 0.75rem 0.75rem; }
+        .modal-header { background-color: #5b20a3; color: white; }
+        .modal-header .btn-close { filter: invert(1) grayscale(100) brightness(200%); }
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 50px; text-transform: capitalize; }
+        .status-funcional { background-color: #d1fae5; color: #065f46; }
+        .status-no-funcional { background-color: #fee2e2; color: #991b1b; }
+        .status-en-mantención { background-color: #fef3c7; color: #92400e; }
+        .status-de-baja { background-color: #e5e7eb; color: #374151; }
+        .status-disponible { background-color: #dbeafe; color: #1e40af; }
+        .status-asignado { background-color: #ede9fe; color: #5b21b6; }
+    </style>
 </head>
 <body>
-    <header b-u6hpi0tvj4>
-        <nav b-u6hpi0tvj4 class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow fixed-top">
-            <div b-u6hpi0tvj4 class="container">
-                <a class="navbar-brand fw-bold" href="/">Algún Nombre Deslumbrante</a>
-                <button b-u6hpi0tvj4 class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span b-u6hpi0tvj4 class="navbar-toggler-icon"></span>
-                </button>
-                <div b-u6hpi0tvj4 class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
-                    <ul b-u6hpi0tvj4 class="navbar-nav">
-                        <li b-u6hpi0tvj4 class="nav-item">
-                            <a b-u6hpi0tvj4 class="nav-link text-dark" href="#inicio">Inicio</a>
-                        </li>
-                        <li b-u6hpi0tvj4 class="nav-item">
-                            <a b-u6hpi0tvj4 class="nav-link text-dark" href="#servicios">Servicios</a>
-                        </li>
-                        <li b-u6hpi0tvj4 class="nav-item">
-                            <a b-u6hpi0tvj4 class="nav-link text-dark" href="#sobre-mi">Sobre mi</a>
-                        </li>
-                        <li b-u6hpi0tvj4 class="nav-item">
-                            <a b-u6hpi0tvj4 class="nav-link text-dark" href="#contacto">Contacto</a>
-                        </li>
-                        <li b-u6hpi0tvj4 class="nav-item">
-                            <a b-u6hpi0tvj4 class="nav-link text-dark" href="#proyectos">Proyectos</a>
-                        </li>
-                    </ul>
+
+    <div class="container demo-container my-5">
+        <div class="text-center mb-4">
+            <h1 class="fw-bold">Demo interactiva de la plataforma de gestión de activos</h1>
+            <p class="lead text-muted">Prueba de forma simulada algunas de las funciones del sistema para gestionar tus activos !!</p>
+            <a href="index.html" class="btn btn-outline-secondary mt-2">Volver al portafolio</a>
+        </div>
+
+        <ul class="nav nav-tabs" id="demoTab" role="tablist">
+            <li class="nav-item" role="presentation"><button class="nav-link active" id="panel-tab" data-bs-toggle="tab" data-bs-target="#panel" type="button" role="tab">Panel general</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="asignacion-tab" data-bs-toggle="tab" data-bs-target="#asignacion" type="button" role="tab">Asignación</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes" type="button" role="tab">Gestión de clientes</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="bodegas-tab" data-bs-toggle="tab" data-bs-target="#bodegas" type="button" role="tab">Gestión de bodegas</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab">Gestión de categorías</button></li>
+        </ul>
+
+        <div class="tab-content" id="demoTabContent">
+            <!-- PANEL GENERAL -->
+            <div class="tab-pane fade show active" id="panel" role="tabpanel">
+                <div id="filters-section" class="card p-3 mb-4 shadow-sm">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2"><label class="form-label">Región</label><select id="filter-region" class="form-select"><option value="">Todas</option></select></div>
+                        <div class="col-md-2"><label class="form-label">Comuna</label><select id="filter-comuna" class="form-select" disabled><option value="">Todas</option></select></div>
+                        <div class="col-md-3"><label class="form-label">Categoría</label><select id="filter-category" class="form-select"><option value="">Todas</option></select></div>
+                        <div class="col-md-2"><label class="form-label">Estado físico</label><select id="filter-estado-fisico" class="form-select"><option value="">Todos</option></select></div>
+                        <div class="col-md-2"><label class="form-label">Asignación</label><select id="filter-estado-asignacion" class="form-select"><option value="">Todos</option></select></div>
+                        <div class="col-md-1"><button id="apply-filters-btn" class="btn btn-primary w-100">Filtrar</button></div>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-    
-    <div b-u6hpi0tvj4 class="main-content">
-        <main b-u6hpi0tvj4 role="main">
-            
-<!-- /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ -->
-<!-- CAMBIO: Se añaden TODAS las librerías necesarias aquí al principio -->
-<!-- /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/shepherd.js/dist/css/shepherd.css"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/shepherd.js/dist/js/shepherd.min.js"></script>
-
-
-<style>
-    /* Estilos específicos para la demo (sin cambios) */
-    .demo-container { max-width: 1600px; margin: auto; }
-    #map { height: 550px; border-radius: 0.75rem; box-shadow: var(--card-shadow); }
-    .table-responsive { max-height: 550px; }
-    .nav-tabs .nav-link { font-weight: 500; color: var(--primary-color); }
-    .nav-tabs .nav-link.active { background-color: var(--light-bg); border-bottom-color: var(--light-bg); }
-    .tab-content { background-color: var(--light-bg); border: 1px solid #dee2e6; border-top: none; padding: 2rem; border-radius: 0 0 0.75rem 0.75rem; }
-    .modal-header { background-color: var(--primary-color); color: white; }
-    .modal-header .btn-close { filter: invert(1) grayscale(100) brightness(200%); }
-    .shepherd-element { background: #343a40; border-radius: 1rem; z-index: 1060; }
-    .shepherd-header { background: #495057; padding: 1rem; }
-    .shepherd-title { color: #fff; font-weight: bold; }
-    .shepherd-text { color: #f8f9fa; padding: 1rem; }
-    .shepherd-button { background: var(--primary-color) !important; border-radius: 50px !important; padding: 0.5rem 1rem !important; color: #fff !important; font-weight: 500 !important; }
-    .shepherd-button:hover { background: var(--primary-color-hover) !important; }
-    .shepherd-arrow::before { background-color: #495057 !important; }
-    .status-badge { display: inline-block; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 50px; text-transform: capitalize; }
-    .status-funcional { background-color: #d1fae5; color: #065f46; }
-    .status-no-funcional { background-color: #fee2e2; color: #991b1b; }
-    .status-en-mantención { background-color: #fef3c7; color: #92400e; }
-    .status-de-baja { background-color: #e5e7eb; color: #374151; }
-    .status-disponible { background-color: #dbeafe; color: #1e40af; }
-    .status-asignado { background-color: #ede9fe; color: #5b21b6; }
-</style>
-
-<div class="container demo-container my-5">
-    <div class="text-center mb-4">
-        <h1 class="fw-bold">Demo Interactiva: Plataforma de Gestión de Activos</h1>
-        <p class="lead text-muted">Explora una simulación completa del portal. Todas las acciones son simuladas en tu navegador.</p>
-        <button id="start-tour-btn" class="btn btn-primary mt-2">
-            <i class="bi bi-play-circle-fill me-2"></i>Iniciar tutorial guiado
-        </button>
-         <a class="btn btn-outline-secondary mt-2" href="/">Volver al Portafolio</a>
-    </div>
-
-    <!-- Pestañas de Navegación -->
-    <ul class="nav nav-tabs" id="demoTab" role="tablist">
-        <li class="nav-item" role="presentation"><button class="nav-link active" id="panel-tab" data-bs-toggle="tab" data-bs-target="#panel" type="button" role="tab">Panel General</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="asignacion-tab" data-bs-toggle="tab" data-bs-target="#asignacion" type="button" role="tab">Asignación</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes" type="button" role="tab">Gestión de Clientes</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="bodegas-tab" data-bs-toggle="tab" data-bs-target="#bodegas" type="button" role="tab">Gestión de Bodegas</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab">Gestión de Categorías</button></li>
-    </ul>
-
-    <!-- Contenido de las Pestañas -->
-    <div class="tab-content" id="demoTabContent">
-        <!-- Pestaña 1: Panel General -->
-        <div class="tab-pane fade show active" id="panel" role="tabpanel">
-            <div id="filters-section" class="card p-3 mb-4 shadow-sm">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-2"><label class="form-label">Región</label><select id="filter-region" class="form-select"><option value="">Todas</option></select></div>
-                    <div class="col-md-2"><label class="form-label">Comuna</label><select id="filter-comuna" class="form-select" disabled><option value="">Todas</option></select></div>
-                    <div class="col-md-3"><label class="form-label">Categoría</label><select id="filter-category" class="form-select"><option value="">Todas</option></select></div>
-                    <div class="col-md-2"><label class="form-label">Estado físico</label><select id="filter-estado-fisico" class="form-select"><option value="">Todos</option></select></div>
-                    <div class="col-md-2"><label class="form-label">Asignación</label><select id="filter-estado-asignacion" class="form-select"><option value="">Todos</option></select></div>
-                    <div class="col-md-1"><button id="apply-filters-btn" class="btn btn-primary w-100">Filtrar</button></div>
-                </div>
-            </div>
-            <div class="row g-4">
-                <div id="table-section" class="col-lg-7">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-header fw-bold d-flex justify-content-between align-items-center">
-                            <span>Lista de Activos</span>
-                            <button id="add-asset-btn" class="btn btn-sm btn-primary">
-                                <i class="bi bi-plus-lg me-1"></i> Registrar Activo
-                            </button>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="table-light"><tr><th>Código</th><th>Categoría</th><th>Estado Físico</th><th>Asignación</th><th>Asignado a</th><th>Ubicación</th><th></th></tr></thead>
-                                    <tbody id="assets-table-body"></tbody>
-                                </table>
+                <div class="row g-4">
+                    <div id="table-section" class="col-lg-7">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+                                <span>Lista de activos</span>
+                                <button id="add-asset-btn" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-lg me-1"></i> Registrar activo
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light"><tr><th>Código</th><th>Categoría</th><th>Estado físico</th><th>Asignación</th><th>Asignado a</th><th>Ubicación</th><th></th></tr></thead>
+                                        <tbody id="assets-table-body"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div id="map-section" class="col-lg-5"><div id="map"></div></div>
                 </div>
-                <div id="map-section" class="col-lg-5"><div id="map"></div></div>
             </div>
-        </div>
-        <!-- Pestaña 2: Asignación -->
-        <div class="tab-pane fade" id="asignacion" role="tabpanel">
-            <div class="form-card" style="max-width: 800px; margin: auto;">
-                 <form id="assignment-form">
-                    <div class="row g-3">
-                        <div class="col-md-6"><label for="assign-assetId" class="form-label fw-bold">1. Selecciona un activo disponible</label><select name="assetId" id="assign-assetId" class="form-select" required><option value="">-- Activos disponibles --</option></select></div>
-                        <div class="col-md-6"><label for="assign-clienteId" class="form-label fw-bold">2. Selecciona un cliente</label><select name="clienteId" id="assign-clienteId" class="form-select" required><option value="">-- Clientes registrados --</option></select></div>
-                        <div class="col-12"><label class="form-label fw-bold">3. Términos y condiciones</label><textarea class="form-control" rows="8" readonly>Este es un contrato de ejemplo para la entrega de activos. Al aceptar, el cliente se hace responsable por el cuidado y correcto uso del activo. Cualquier daño o pérdida será responsabilidad del cliente y deberá ser reportado inmediatamente. El activo debe ser devuelto en las mismas condiciones en que fue recibido, salvo el desgaste normal por uso.</textarea></div>
-                        <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="termsCheck" required><label class="form-check-label" for="termsCheck">El cliente ha leído y acepta los términos y condiciones.</label></div></div>
-                    </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4"><button type="submit" id="assignButton" class="btn btn-primary" disabled>Confirmar asignación</button></div>
-                </form>
+            <!-- ASIGNACION -->
+            <div class="tab-pane fade" id="asignacion" role="tabpanel">
+                <div class="form-card" style="max-width: 800px; margin: auto;">
+                     <form id="assignment-form">
+                        <div class="row g-3">
+                            <div class="col-md-6"><label for="assign-assetId" class="form-label fw-bold">1. Selecciona un activo disponible</label><select name="assetId" id="assign-assetId" class="form-select" required><option value="">-- Activos disponibles --</option></select></div>
+                            <div class="col-md-6"><label for="assign-clienteId" class="form-label fw-bold">2. Selecciona un cliente</label><select name="clienteId" id="assign-clienteId" class="form-select" required><option value="">-- Clientes registrados --</option></select></div>
+                            <div class="col-12"><label class="form-label fw-bold">3. Términos y condiciones</label><textarea class="form-control" rows="8" readonly>ESTE ES UN CONTRATO DE EJEMPLO PARA LA ENTREGA DE ACTIVOS...</textarea></div>
+                            <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="termsCheck" required><label class="form-check-label" for="termsCheck">El cliente ha leído y acepta los términos</label></div></div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4"><button type="submit" id="assignButton" class="btn btn-primary" disabled>Confirmar</button></div>
+                    </form>
+                </div>
             </div>
-        </div>
-        <!-- Pestaña 3: Gestión de Clientes -->
-        <div class="tab-pane fade" id="clientes" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="mb-0">Lista de Clientes</h4>
-                <button id="add-client-btn" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Nuevo Cliente</button>
+            <!-- GESTION CLIENTES -->
+            <div class="tab-pane fade" id="clientes" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Lista de clientes</h4>
+                    <button id="add-client-btn" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Nuevo cliente</button>
+                </div>
+                <div class="table-responsive card p-2"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Nombre</th><th>Apellido</th><th>RUT</th><th>Empresa</th><th>Dirección</th><th></th></tr></thead><tbody id="clients-table-body"></tbody></table></div>
             </div>
-            <div class="table-responsive card p-2"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Nombre</th><th>Apellido</th><th>RUT</th><th>Empresa</th><th>Dirección</th><th></th></tr></thead><tbody id="clients-table-body"></tbody></table></div>
-        </div>
-        <!-- Pestaña 4: Gestión de Bodegas -->
-        <div class="tab-pane fade" id="bodegas" role="tabpanel">
-             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="mb-0">Lista de Bodegas</h4>
-                <button id="add-warehouse-btn" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Nueva Bodega</button>
+            <!-- GESTION BODEGAS -->
+            <div class="tab-pane fade" id="bodegas" role="tabpanel">
+                 <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Lista de bodegas</h4>
+                    <button id="add-warehouse-btn" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Nueva bodega</button>
+                </div>
+                <div class="table-responsive card p-2"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Nombre</th><th>Dirección</th><th></th></tr></thead><tbody id="warehouses-table-body"></tbody></table></div>
             </div>
-            <div class="table-responsive card p-2"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Nombre</th><th>Dirección</th><th></th></tr></thead><tbody id="warehouses-table-body"></tbody></table></div>
-        </div>
-        <!-- Pestaña 5: Gestión de Categorías -->
-        <div class="tab-pane fade" id="categorias" role="tabpanel">
-            <div class="row">
-                <div class="col-md-5">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Nueva Categoría</h5>
-                            <form id="category-form" class="row g-3 align-items-end">
-                                <div class="col"><label for="new-category-name" class="form-label">Nombre</label><input type="text" id="new-category-name" class="form-control" required></div>
-                                <div class="col-auto"><button type="submit" class="btn btn-primary">Añadir</button></div>
-                            </form>
+            <!-- GESTION CATEGORÍAS -->
+            <div class="tab-pane fade" id="categorias" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Nueva categoría</h5>
+                                <form id="category-form" class="row g-3 align-items-end">
+                                    <div class="col"><label for="new-category-name" class="form-label">Nombre</label><input type="text" id="new-category-name" class="form-control" required></div>
+                                    <div class="col-auto"><button type="submit" class="btn btn-primary">Añadir</button></div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-7">
-                     <h4 class="mb-3">Categorías Existentes</h4>
-                    <div class="table-responsive card p-2"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Nombre</th><th></th></tr></thead><tbody id="categories-table-body"></tbody></table></div>
+                    <div class="col-md-7">
+                         <h4 class="mb-3">Categorías existentes</h4>
+                        <div class="table-responsive card p-2"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Nombre</th><th></th></tr></thead><tbody id="categories-table-body"></tbody></table></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modales -->
-<div class="modal fade" id="formModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="formModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="formModalBody"></div></div></div></div>
-<div class="modal fade" id="returnModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Registrar Devolución</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="returnModalBody"></div></div></div></div>
+    <div class="modal fade" id="formModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="formModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="formModalBody"></div></div></div></div>
+    <div class="modal fade" id="returnModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Registrar Devolución</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="returnModalBody"></div></div></div></div>
 
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const db = {
+                assets: [
+                    { id: 1, code: 'NB-001', category: 'Notebook', estadoFisico: 'Funcional', estadoAsignacion: 'Asignado', clienteId: 1, region: 'Metropolitana de Santiago', comuna: 'Las Condes', street: 'Av. Apoquindo 5000', lat: -33.4093, lng: -70.5732, details: 'Laptop Lenovo, proce i7, 16GB RAM' },
+                    { id: 2, code: 'CEL-005', category: 'Celular', estadoFisico: 'En mantención', estadoAsignacion: 'Disponible', clienteId: null, region: 'Metropolitana de Santiago', comuna: 'Santiago', street: 'Av. Libertador Bernardo O\'Higgins 108', lat: -33.4449, lng: -70.6510, details: 'iPhone 13, se requiere cambio de batería' },
+                    { id: 3, code: 'IMP-002', category: 'Impresora', estadoFisico: 'Funcional', estadoAsignacion: 'Disponible', clienteId: null, region: 'Metropolitana de Santiago', comuna: 'Pudahuel', street: 'Av. Américo Vespucio 1501', lat: -33.4338, lng: -70.7820, details: 'Impresora láser HP XXYYZZ Pro' },
+                    { id: 4, code: 'NB-008', category: 'Notebook', estadoFisico: 'No funcional', estadoAsignacion: 'Disponible', clienteId: null, region: 'Valparaíso', comuna: 'Valparaíso', street: 'Av. Errázuriz 629', lat: -33.0458, lng: -71.6210, details: 'Macbook Pro 18", no enciende' },
+                    { id: 5, code: 'MON-003', category: 'Monitor', estadoFisico: 'Funcional', estadoAsignacion: 'Asignado', clienteId: 2, region: 'Biobío', comuna: 'Concepción', street: 'Av. Arturo Prat 565', lat: -36.8273, lng: -73.0498, details: 'Monitor HP 24" 4K' },
+                ],
+                clients: [
+                    { id: 1, name: 'María José', lastName: 'Sambuceti', rut: '15.123.456-7', company: 'Innovatec SpA', region: 'Metropolitana de Santiago', comuna: 'Las Condes', street: 'Av. Apoquindo 5000' },
+                    { id: 2, name: 'Álvaro', lastName: 'Soto', rut: '18.987.654-3', company: 'Soluciones Sur', region: 'Biobío', comuna: 'Concepción', street: 'Av. Arturo Prat 565' },
+                ],
+                warehouses: [
+                    { id: 1, name: 'Bodega Central', region: 'Metropolitana de Santiago', comuna: 'Santiago', street: 'Av. Libertador Bernardo O\'Higgins 108' },
+                    { id: 2, name: 'Bodega Norte', region: 'Metropolitana de Santiago', comuna: 'Pudahuel', street: 'Av. Américo Vespucio 1501' },
+                    { id: 3, name: 'Sucursal Valparaíso', region: 'Valparaíso', comuna: 'Valparaíso', street: 'Av. Errázuriz 629' },
+                ],
+                categories: [
+                    { id: 1, name: 'Notebook' }, { id: 2, name: 'Celular' }, { id: 3, name: 'Impresora' }, { id: 4, name: 'Monitor' }
+                ],
+                geographicalData: {
+                    'Metropolitana de Santiago': ['Santiago', 'Las Condes', 'Pudahuel', 'Providencia', 'Maipú'],
+                    'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Quilpué', 'Villa Alemana'],
+                    'Biobío': ['Concepción', 'Talcahuano', 'Chiguayante', 'San Pedro de la Paz'],
+                },
+                estadosFisicos: ['Funcional', 'No funcional', 'En mantención', 'De baja'],
+                estadosAsignacion: ['Disponible', 'Asignado'],
+            };
 
-        </main>
-    </div>
+            let map;
+            let markersLayer = L.featureGroup();
+            const formModal = new bootstrap.Modal(document.getElementById('formModal'));
+            const returnModal = new bootstrap.Modal(document.getElementById('returnModal'));
 
-    <footer b-u6hpi0tvj4 class="border-top footer text-muted text-center">
-        <div b-u6hpi0tvj4 class="container py-3">
-            &copy; 2025 - Matías Torrejón Rivera
-        </div>
-    </footer>
-
-    <script src="/lib/jquery/dist/jquery.min.js"></script>
-    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo"></script>
-    
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    const db = {
-        assets: [
-            { id: 1, code: 'NB-001', category: 'Notebooks', estadoFisico: 'Funcional', estadoAsignacion: 'Asignado', clienteId: 1, region: 'Metropolitana de Santiago', comuna: 'Las Condes', street: 'Av. Apoquindo 5000', lat: -33.4093, lng: -70.5732, details: 'Laptop Dell XPS 15, i7, 16GB RAM' },
-            { id: 2, code: 'CEL-005', category: 'Celulares', estadoFisico: 'En mantención', estadoAsignacion: 'Disponible', clienteId: null, region: 'Metropolitana de Santiago', comuna: 'Santiago', street: 'Av. Libertador Bernardo O\'Higgins 108', lat: -33.4449, lng: -70.6510, details: 'iPhone 13 Pro, requiere cambio de batería.' },
-            { id: 3, code: 'IMP-002', category: 'Impresoras', estadoFisico: 'Funcional', estadoAsignacion: 'Disponible', clienteId: null, region: 'Metropolitana de Santiago', comuna: 'Pudahuel', street: 'Av. Américo Vespucio 1501', lat: -33.4338, lng: -70.7820, details: 'Impresora láser HP LaserJet Pro M404n' },
-            { id: 4, code: 'NB-008', category: 'Notebooks', estadoFisico: 'No funcional', estadoAsignacion: 'Disponible', clienteId: null, region: 'Valparaíso', comuna: 'Valparaíso', street: 'Av. Errázuriz 629', lat: -33.0458, lng: -71.6210, details: 'MacBook Pro 16", no enciende.' },
-            { id: 5, code: 'MON-003', category: 'Monitores', estadoFisico: 'Funcional', estadoAsignacion: 'Asignado', clienteId: 2, region: 'Biobío', comuna: 'Concepción', street: 'Av. Arturo Prat 565', lat: -36.8273, lng: -73.0498, details: 'Monitor LG 27" 4K UltraFine' },
-        ],
-        clients: [
-            { id: 1, name: 'Ana', lastName: 'García', rut: '15.123.456-7', company: 'Innovatec SpA', region: 'Metropolitana de Santiago', comuna: 'Las Condes', street: 'Av. Apoquindo 5000' },
-            { id: 2, name: 'Carlos', lastName: 'Soto', rut: '18.987.654-3', company: 'Soluciones Sur', region: 'Biobío', comuna: 'Concepción', street: 'Av. Arturo Prat 565' },
-        ],
-        warehouses: [
-            { id: 1, name: 'Bodega Central', region: 'Metropolitana de Santiago', comuna: 'Santiago', street: 'Av. Libertador Bernardo O\'Higgins 108' },
-            { id: 2, name: 'Bodega Norte', region: 'Metropolitana de Santiago', comuna: 'Pudahuel', street: 'Av. Américo Vespucio 1501' },
-            { id: 3, name: 'Sucursal Valparaíso', region: 'Valparaíso', comuna: 'Valparaíso', street: 'Av. Errázuriz 629' },
-        ],
-        categories: [
-            { id: 1, name: 'Notebooks' }, { id: 2, name: 'Celulares' }, { id: 3, name: 'Impresoras' }, { id: 4, name: 'Monitores' }
-        ],
-        geographicalData: {
-            'Metropolitana de Santiago': ['Santiago', 'Las Condes', 'Pudahuel', 'Providencia', 'Maipú'],
-            'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Quilpué', 'Villa Alemana'],
-            'Biobío': ['Concepción', 'Talcahuano', 'Chiguayante', 'San Pedro de la Paz'],
-        },
-        estadosFisicos: ['Funcional', 'No funcional', 'En mantención', 'De baja'],
-        estadosAsignacion: ['Disponible', 'Asignado'],
-    };
-
-    let map;
-    let markersLayer = L.featureGroup();
-    const formModal = new bootstrap.Modal(document.getElementById('formModal'));
-    const returnModal = new bootstrap.Modal(document.getElementById('returnModal'));
-
-    function renderAssets(filteredAssets = db.assets) {
-        const tableBody = document.getElementById('assets-table-body');
-        tableBody.innerHTML = '';
-        if (filteredAssets.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No se encontraron activos.</td></tr>';
-            renderMapMarkers([]);
-            return;
-        }
-
-        filteredAssets.forEach(asset => {
-            const cliente = asset.clienteId ? db.clients.find(c => c.id === asset.clienteId) : null;
-            const rowHtml = `
-                <tr data-asset-id="${asset.id}">
-                    <td>${asset.code}</td>
-                    <td>${asset.category}</td>
-                    <td><span class="status-badge status-${asset.estadoFisico.toLowerCase().replace(' ', '-')}">${asset.estadoFisico}</span></td>
-                    <td><span class="status-badge status-${asset.estadoAsignacion.toLowerCase()}">${asset.estadoAsignacion}</span></td>
-                    <td>${cliente ? `${cliente.name} ${cliente.lastName}` : 'N/A'}</td>
-                    <td>${asset.street}, ${asset.comuna}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary btn-edit-asset" data-id="${asset.id}" title="Editar"><i class="bi bi-pencil"></i></button>
-                        ${asset.estadoAsignacion === 'Asignado' ? `<button class="btn btn-sm btn-outline-info btn-return-asset" data-id="${asset.id}" title="Registrar Devolución"><i class="bi bi-arrow-return-left"></i></button>` : ''}
-                        <button class="btn btn-sm btn-outline-danger btn-delete-asset" data-id="${asset.id}" title="Eliminar"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('beforeend', rowHtml);
-        });
-        renderMapMarkers(filteredAssets);
-    }
-    
-    function renderClients() {
-        const tableBody = document.getElementById('clients-table-body');
-        tableBody.innerHTML = '';
-        db.clients.forEach(client => {
-            const row = `
-                <tr>
-                    <td>${client.name}</td>
-                    <td>${client.lastName}</td>
-                    <td>${client.rut}</td>
-                    <td>${client.company}</td>
-                    <td>${client.street}, ${client.comuna}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary btn-edit-client" data-id="${client.id}"><i class="bi bi-pencil"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-delete-client" data-id="${client.id}"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('beforeend', row);
-        });
-    }
-
-    function renderWarehouses() {
-        const tableBody = document.getElementById('warehouses-table-body');
-        tableBody.innerHTML = '';
-        db.warehouses.forEach(warehouse => {
-            const row = `
-                <tr>
-                    <td>${warehouse.name}</td>
-                    <td>${warehouse.street}, ${warehouse.comuna}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary btn-edit-warehouse" data-id="${warehouse.id}"><i class="bi bi-pencil"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-delete-warehouse" data-id="${warehouse.id}"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('beforeend', row);
-        });
-    }
-
-    function renderCategories() {
-        const tableBody = document.getElementById('categories-table-body');
-        tableBody.innerHTML = '';
-        db.categories.forEach(category => {
-            const row = `
-                <tr>
-                    <td>${category.name}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-danger btn-delete-category" data-id="${category.id}"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('beforeend', row);
-        });
-    }
-
-    function populateFilters() {
-        const regionFilter = document.getElementById('filter-region');
-        regionFilter.innerHTML = '<option value="">Todas</option>';
-        Object.keys(db.geographicalData).sort().forEach(region => {
-            regionFilter.add(new Option(region, region));
-        });
-
-        const categoryFilter = document.getElementById('filter-category');
-        categoryFilter.innerHTML = '<option value="">Todas</option>';
-        db.categories.map(c => c.name).sort().forEach(name => {
-            categoryFilter.add(new Option(name, name));
-        });
-
-        const estadoFisicoFilter = document.getElementById('filter-estado-fisico');
-        estadoFisicoFilter.innerHTML = '<option value="">Todos</option>';
-        db.estadosFisicos.forEach(estado => {
-            estadoFisicoFilter.add(new Option(estado, estado));
-        });
-
-        const estadoAsignacionFilter = document.getElementById('filter-estado-asignacion');
-        estadoAsignacionFilter.innerHTML = '<option value="">Todos</option>';
-        db.estadosAsignacion.forEach(estado => {
-            estadoAsignacionFilter.add(new Option(estado, estado));
-        });
-    }
-
-    window.updateComunaOptions = (region, selectElement) => {
-        let options = '<option value="">-- Seleccione --</option>';
-        if (region && db.geographicalData[region]) {
-            options += db.geographicalData[region].sort().map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-        selectElement.innerHTML = options;
-    };
-    
-    function initMap() {
-        if(map) map.remove();
-        map = L.map('map').setView([-36.82, -73.04], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
-        markersLayer.addTo(map);
-    }
-
-    function renderMapMarkers(assetsToRender) {
-        markersLayer.clearLayers();
-        const colorMap = { 'Funcional': 'green', 'No funcional': 'red', 'En mantención': 'orange', 'De baja': 'grey' };
-        assetsToRender.forEach(asset => {
-            if (asset.lat && asset.lng) {
-                const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${colorMap[asset.estadoFisico] || 'blue'}.png`;
-                const shadowUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png';
-                const customIcon = new L.Icon({ iconUrl, shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
-                const marker = L.marker([asset.lat, asset.lng], { icon: customIcon });
-                marker.bindPopup(`<b>${asset.code}</b><br>${asset.category}<br><b>Estado:</b> ${asset.estadoFisico}`);
-                markersLayer.addLayer(marker);
-            }
-        });
-        const bounds = markersLayer.getBounds();
-        if (bounds.isValid()) {
-            map.fitBounds(bounds.pad(0.1));
-        } else {
-             map.setView([-36.82, -73.04], 5);
-        }
-    }
-    
-    function applyFilters() {
-        const region = document.getElementById('filter-region').value;
-        const comuna = document.getElementById('filter-comuna').value;
-        const category = document.getElementById('filter-category').value;
-        const estadoFisico = document.getElementById('filter-estado-fisico').value;
-        const estadoAsignacion = document.getElementById('filter-estado-asignacion').value;
-
-        const filtered = db.assets.filter(asset =>
-            (!region || asset.region === region) &&
-            (!comuna || asset.comuna === comuna) &&
-            (!category || asset.category === category) &&
-            (!estadoFisico || asset.estadoFisico === estadoFisico) &&
-            (!estadoAsignacion || asset.estadoAsignacion === estadoAsignacion)
-        );
-        renderAssets(filtered);
-    }
-
-    function showFormModal(type, id = null) {
-        const modalLabel = document.getElementById('formModalLabel');
-        const modalBody = document.getElementById('formModalBody');
-        let html = '';
-        let title = '';
-
-        const getRegionOptions = (selected = '') => `<option value="">-- Seleccione --</option>` + Object.keys(db.geographicalData).sort().map(r => `<option value="${r}" ${r === selected ? 'selected' : ''}>${r}</option>`).join('');
-        const getComunaOptions = (region, selected = '') => {
-            let options = '<option value="">-- Seleccione --</option>';
-            if (region && db.geographicalData[region]) {
-                options += db.geographicalData[region].sort().map(c => `<option value="${c}" ${c === selected ? 'selected' : ''}>${c}</option>`).join('');
-            }
-            return options;
-        };
-
-        if (type === 'asset') {
-            const asset = id ? db.assets.find(a => a.id === id) : { id: null, code: '', category: 'Notebooks', estadoFisico: 'Funcional', details: ''};
-            title = id ? 'Editar Activo' : 'Registrar Nuevo Activo';
-            html = `
-                <form id="asset-form" data-id="${asset.id || ''}">
-                    <div class="row g-3">
-                        <div class="col-md-6"><label class="form-label">Código</label><input type="text" name="code" class="form-control" value="${asset.code || ''}" required></div>
-                        <div class="col-md-6"><label class="form-label">Categoría</label><select name="category" class="form-select">${db.categories.map(c => c.name).sort().map(c => `<option value="${c}" ${c === asset.category ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
-                        ${!id ? `<div class="col-md-6"><label class="form-label">Bodega Inicial</label><select name="bodegaId" class="form-select" required>${db.warehouses.map(w => `<option value="${w.id}">${w.name} (${w.comuna})</option>`).join('')}</select></div>` : ''}
-                        <div class="col-md-6"><label class="form-label">Estado Físico</label><select name="estadoFisico" class="form-select">${db.estadosFisicos.map(e => `<option value="${e}" ${e === asset.estadoFisico ? 'selected' : ''}>${e}</option>`).join('')}</select></div>
-                        <div class="col-12"><label class="form-label">Detalles</label><textarea name="details" class="form-control" rows="3">${asset.details || ''}</textarea></div>
-                    </div>
-                     <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Guardar cambios</button></div>
-                </form>`;
-        } else if (type === 'client') {
-             const client = id ? db.clients.find(c => c.id === id) : { id: null, name: '', lastName: '', rut: '', company: '', region: '', comuna: '', street: '' };
-             title = id ? 'Editar Cliente' : 'Nuevo Cliente';
-             html = `
-                <form id="client-form" data-id="${client.id || ''}">
-                     <div class="row g-3">
-                         <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" name="name" class="form-control" value="${client.name || ''}" required></div>
-                         <div class="col-md-6"><label class="form-label">Apellido</label><input type="text" name="lastName" class="form-control" value="${client.lastName || ''}" required></div>
-                         <div class="col-md-6"><label class="form-label">RUT</label><input type="text" name="rut" class="form-control" value="${client.rut || ''}" required></div>
-                         <div class="col-md-6"><label class="form-label">Empresa</label><input type="text" name="company" class="form-control" value="${client.company || ''}"></div>
-                         <div class="col-md-6"><label class="form-label">Región</label><select name="region" class="form-select" onchange="window.updateComunaOptions(this.value, this.form.comuna)">${getRegionOptions(client.region)}</select></div>
-                         <div class="col-md-6"><label class="form-label">Comuna</label><select name="comuna" class="form-select">${getComunaOptions(client.region, client.comuna)}</select></div>
-                         <div class="col-12"><label class="form-label">Calle y Número</label><input type="text" name="street" class="form-control" value="${client.street || ''}" required></div>
-                     </div>
-                     <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Guardar</button></div>
-                 </form>`;
-        } else if (type === 'warehouse') {
-            const warehouse = id ? db.warehouses.find(w => w.id === id) : { id: null, name: '', region: '', comuna: '', street: '' };
-            title = id ? 'Editar Bodega' : 'Nueva Bodega';
-            html = `
-                <form id="warehouse-form" data-id="${warehouse.id || ''}">
-                    <div class="row g-3">
-                        <div class="col-12"><label class="form-label">Nombre</label><input type="text" name="name" class="form-control" value="${warehouse.name || ''}" required></div>
-                        <div class="col-md-6"><label class="form-label">Región</label><select name="region" class="form-select" onchange="window.updateComunaOptions(this.value, this.form.comuna)">${getRegionOptions(warehouse.region)}</select></div>
-                        <div class="col-md-6"><label class="form-label">Comuna</label><select name="comuna" class="form-select">${getComunaOptions(warehouse.region, warehouse.comuna)}</select></div>
-                        <div class="col-12"><label class="form-label">Calle y Número</label><input type="text" name="street" class="form-control" value="${warehouse.street || ''}" required></div>
-                    </div>
-                    <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Guardar</button></div>
-                </form>`;
-        }
-        
-        modalLabel.textContent = title;
-        modalBody.innerHTML = html;
-        formModal.show();
-    }
-
-    function handleFormSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        const id = form.dataset.id ? parseInt(form.dataset.id) : null;
-
-        if (form.id === 'asset-form') {
-            if (id) {
-                const index = db.assets.findIndex(a => a.id === id);
-                if (index !== -1) {
-                    db.assets[index] = { ...db.assets[index], ...data };
+            function renderAssets(filteredAssets = db.assets) {
+                const tableBody = document.getElementById('assets-table-body');
+                tableBody.innerHTML = '';
+                if (filteredAssets.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No se encontraron activos</td></tr>';
+                    renderMapMarkers([]);
+                    return;
                 }
-            } else {
-                const newId = (db.assets.length > 0 ? Math.max(...db.assets.map(a => a.id)) : 0) + 1;
-                const bodega = db.warehouses.find(w => w.id === parseInt(data.bodegaId));
-                if (bodega) {
-                    db.assets.push({ 
-                        id: newId, 
-                        code: data.code, 
-                        category: data.category, 
-                        estadoFisico: data.estadoFisico,
-                        details: data.details,
-                        estadoAsignacion: 'Disponible',
-                        clienteId: null,
-                        region: bodega.region,
-                        comuna: bodega.comuna,
-                        street: bodega.street,
-                        lat: -33.45 + (Math.random() - 0.5) * 0.1,
-                        lng: -70.66 + (Math.random() - 0.5) * 0.1
-                    });
-                }
+                filteredAssets.forEach(asset => {
+                    const cliente = asset.clienteId ? db.clients.find(c => c.id === asset.clienteId) : null;
+                    tableBody.innerHTML += `
+                        <tr data-asset-id="${asset.id}">
+                            <td>${asset.code}</td><td>${asset.category}</td>
+                            <td><span class="status-badge status-${asset.estadoFisico.toLowerCase().replace(' ', '-')}">${asset.estadoFisico}</span></td>
+                            <td><span class="status-badge status-${asset.estadoAsignacion.toLowerCase()}">${asset.estadoAsignacion}</span></td>
+                            <td>${cliente ? `${cliente.name} ${cliente.lastName}` : 'N/A'}</td>
+                            <td>${asset.street}, ${asset.comuna}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary btn-edit-asset" data-id="${asset.id}" title="Editar"><i class="bi bi-pencil"></i></button>
+                                ${asset.estadoAsignacion === 'Asignado' ? `<button class="btn btn-sm btn-outline-info btn-return-asset" data-id="${asset.id}" title="Registrar devolución"><i class="bi bi-arrow-return-left"></i></button>` : ''}
+                                <button class="btn btn-sm btn-outline-danger btn-delete-asset" data-id="${asset.id}" title="Eliminar"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+                renderMapMarkers(filteredAssets);
             }
-        } else if(form.id === 'client-form') {
-            if (id) {
-                const index = db.clients.findIndex(c => c.id === id);
-                if (index !== -1) {
-                    db.clients[index] = { ...db.clients[index], ...data, id };
-                }
-            } else {
-                const newId = (db.clients.length > 0 ? Math.max(...db.clients.map(c => c.id)) : 0) + 1;
-                db.clients.push({ id: newId, ...data });
-            }
-        } else if(form.id === 'warehouse-form') {
-             if (id) {
-                const index = db.warehouses.findIndex(w => w.id === id);
-                 if (index !== -1) {
-                    db.warehouses[index] = { ...db.warehouses[index], ...data, id };
-                }
-            } else {
-                const newId = (db.warehouses.length > 0 ? Math.max(...db.warehouses.map(w => w.id)) : 0) + 1;
-                db.warehouses.push({ id: newId, ...data });
-            }
-        }
-        
-        formModal.hide();
-        refreshAll();
-    }
-    
-    function refreshAll() {
-        renderAssets();
-        renderClients();
-        renderWarehouses();
-        renderCategories();
-        populateFilters();
-        populateAssignmentDropdowns();
-    }
-
-    function populateAssignmentDropdowns() {
-        const assetSelect = document.getElementById('assign-assetId');
-        assetSelect.innerHTML = '<option value="">-- Activos disponibles --</option>';
-        db.assets.filter(a => a.estadoAsignacion === 'Disponible').sort((a,b) => a.code.localeCompare(b.code)).forEach(a => {
-            assetSelect.add(new Option(`${a.code} (${a.category})`, a.id));
-        });
-
-        const clientSelect = document.getElementById('assign-clienteId');
-        clientSelect.innerHTML = '<option value="">-- Clientes registrados --</option>';
-        db.clients.sort((a,b) => a.lastName.localeCompare(b.lastName)).forEach(c => {
-            clientSelect.add(new Option(`${c.lastName}, ${c.name} (${c.company || 'N/A'})`, c.id));
-        });
-    }
-
-    function setupEventListeners() {
-        document.getElementById('apply-filters-btn').addEventListener('click', applyFilters);
-        document.getElementById('filter-region').addEventListener('change', (e) => {
-            const comunaSelect = document.getElementById('filter-comuna');
-            comunaSelect.innerHTML = '<option value="">Todas</option>';
-            comunaSelect.disabled = !e.target.value;
-            if (e.target.value && db.geographicalData[e.target.value]) {
-                db.geographicalData[e.target.value].sort().forEach(comuna => {
-                    comunaSelect.add(new Option(comuna, comuna));
+            
+            function renderClients() {
+                const tableBody = document.getElementById('clients-table-body');
+                tableBody.innerHTML = '';
+                db.clients.forEach(client => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${client.name}</td><td>${client.lastName}</td><td>${client.rut}</td><td>${client.company}</td>
+                            <td>${client.street}, ${client.comuna}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary btn-edit-client" data-id="${client.id}"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger btn-delete-client" data-id="${client.id}"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>`;
                 });
             }
-        });
 
-        document.getElementById('add-asset-btn').addEventListener('click', () => showFormModal('asset'));
-        document.getElementById('add-client-btn').addEventListener('click', () => showFormModal('client'));
-        document.getElementById('add-warehouse-btn').addEventListener('click', () => showFormModal('warehouse'));
-        
-        document.getElementById('category-form').addEventListener('submit', e => {
-            e.preventDefault();
-            const input = document.getElementById('new-category-name');
-            const newName = input.value.trim();
-            if (newName && !db.categories.some(c => c.name.toLowerCase() === newName.toLowerCase())) {
-                const newId = (db.categories.length > 0 ? Math.max(...db.categories.map(c => c.id)) : 0) + 1;
-                db.categories.push({ id: newId, name: newName });
+            function renderWarehouses() {
+                const tableBody = document.getElementById('warehouses-table-body');
+                tableBody.innerHTML = '';
+                db.warehouses.forEach(warehouse => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${warehouse.name}</td><td>${warehouse.street}, ${warehouse.comuna}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary btn-edit-warehouse" data-id="${warehouse.id}"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger btn-delete-warehouse" data-id="${warehouse.id}"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+            }
+
+            function renderCategories() {
+                const tableBody = document.getElementById('categories-table-body');
+                tableBody.innerHTML = '';
+                db.categories.forEach(category => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${category.name}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger btn-delete-category" data-id="${category.id}"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+            }
+
+            function populateFilters() {
+                const regionFilter = document.getElementById('filter-region');
+                regionFilter.innerHTML = '<option value="">Todas</option>';
+                Object.keys(db.geographicalData).sort().forEach(region => { regionFilter.add(new Option(region, region)); });
+
+                const categoryFilter = document.getElementById('filter-category');
+                categoryFilter.innerHTML = '<option value="">Todas</option>';
+                db.categories.map(c => c.name).sort().forEach(name => { categoryFilter.add(new Option(name, name)); });
+
+                const estadoFisicoFilter = document.getElementById('filter-estado-fisico');
+                estadoFisicoFilter.innerHTML = '<option value="">Todos</option>';
+                db.estadosFisicos.forEach(estado => { estadoFisicoFilter.add(new Option(estado, estado)); });
+
+                const estadoAsignacionFilter = document.getElementById('filter-estado-asignacion');
+                estadoAsignacionFilter.innerHTML = '<option value="">Todos</option>';
+                db.estadosAsignacion.forEach(estado => { estadoAsignacionFilter.add(new Option(estado, estado)); });
+            }
+
+            window.updateComunaOptions = (region, selectElement) => {
+                let options = '<option value="">-- Seleccione --</option>';
+                if (region && db.geographicalData[region]) {
+                    options += db.geographicalData[region].sort().map(c => `<option value="${c}">${c}</option>`).join('');
+                }
+                selectElement.innerHTML = options;
+            };
+            
+            function initMap() {
+                if(map) map.remove();
+                map = L.map('map').setView([-36.82, -73.04], 5);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+                markersLayer.addTo(map);
+            }
+
+            function renderMapMarkers(assetsToRender) {
+                markersLayer.clearLayers();
+                const colorMap = { 'Funcional': 'green', 'No funcional': 'red', 'En mantención': 'orange', 'De baja': 'grey' };
+                assetsToRender.forEach(asset => {
+                    if (asset.lat && asset.lng) {
+                        const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${colorMap[asset.estadoFisico] || 'blue'}.png`;
+                        const shadowUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png';
+                        const customIcon = new L.Icon({ iconUrl, shadowUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+                        const marker = L.marker([asset.lat, asset.lng], { icon: customIcon });
+                        marker.bindPopup(`<b>${asset.code}</b><br>${asset.category}<br><b>Estado:</b> ${asset.estadoFisico}`);
+                        markersLayer.addLayer(marker);
+                    }
+                });
+                const bounds = markersLayer.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds.pad(0.1));
+                } else {
+                     map.setView([-36.82, -73.04], 5);
+                }
+            }
+            
+            function applyFilters() {
+                const region = document.getElementById('filter-region').value;
+                const comuna = document.getElementById('filter-comuna').value;
+                const category = document.getElementById('filter-category').value;
+                const estadoFisico = document.getElementById('filter-estado-fisico').value;
+                const estadoAsignacion = document.getElementById('filter-estado-asignacion').value;
+                const filtered = db.assets.filter(asset =>
+                    (!region || asset.region === region) &&
+                    (!comuna || asset.comuna === comuna) &&
+                    (!category || asset.category === category) &&
+                    (!estadoFisico || asset.estadoFisico === estadoFisico) &&
+                    (!estadoAsignacion || asset.estadoAsignacion === estadoAsignacion)
+                );
+                renderAssets(filtered);
+            }
+
+            function showFormModal(type, id = null) {
+                const modalLabel = document.getElementById('formModalLabel');
+                const modalBody = document.getElementById('formModalBody');
+                let html = '';
+                let title = '';
+
+                const getRegionOptions = (selected = '') => `<option value="">--</option>` + Object.keys(db.geographicalData).sort().map(r => `<option value="${r}" ${r === selected ? 'selected' : ''}>${r}</option>`).join('');
+                const getComunaOptions = (region, selected = '') => {
+                    let options = '<option value="">--</option>';
+                    if (region && db.geographicalData[region]) {
+                        options += db.geographicalData[region].sort().map(c => `<option value="${c}" ${c === selected ? 'selected' : ''}>${c}</option>`).join('');
+                    }
+                    return options;
+                };
+
+                if (type === 'asset') {
+                    const asset = id ? db.assets.find(a => a.id === id) : {};
+                    title = id ? 'Editar Activo' : 'Registrar Nuevo Activo';
+                    html = `
+                        <form id="asset-form" data-id="${asset.id || ''}">
+                            <div class="row g-3">
+                                <div class="col-md-6"><label class="form-label">Código</label><input type="text" name="code" class="form-control" value="${asset.code || ''}" required></div>
+                                <div class="col-md-6"><label class="form-label">Categoría</label><select name="category" class="form-select">${db.categories.map(c=>c.name).sort().map(c => `<option value="${c}" ${c === asset.category ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+                                ${!id ? `<div class="col-md-6"><label class="form-label">Bodega inicial</label><select name="bodegaId" class="form-select" required><option value="">-- Seleccione --</option>${db.warehouses.map(w => `<option value="${w.id}">${w.name} (${w.comuna})</option>`).join('')}</select></div>` : ''}
+                                <div class="col-md-6"><label class="form-label">Estado físico</label><select name="estadoFisico" class="form-select">${db.estadosFisicos.map(e => `<option value="${e}" ${e === asset.estadoFisico ? 'selected' : ''}>${e}</option>`).join('')}</select></div>
+                                <div class="col-12"><label class="form-label">Detalles</label><textarea name="details" class="form-control" rows="3">${asset.details || ''}</textarea></div>
+                            </div>
+                             <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Guardar cambios</button></div>
+                        </form>`;
+                } else if (type === 'client') {
+                     const client = id ? db.clients.find(c => c.id === id) : {};
+                     title = id ? 'Editar cliente' : 'Nuevo cliente';
+                     html = `
+                        <form id="client-form" data-id="${client.id || ''}">
+                             <div class="row g-3">
+                                 <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" name="name" class="form-control" value="${client.name || ''}" required></div>
+                                 <div class="col-md-6"><label class="form-label">Apellido</label><input type="text" name="lastName" class="form-control" value="${client.lastName || ''}" required></div>
+                                 <div class="col-md-6"><label class="form-label">RUT</label><input type="text" name="rut" class="form-control" value="${client.rut || ''}" required></div>
+                                 <div class="col-md-6"><label class="form-label">Empresa</label><input type="text" name="company" class="form-control" value="${client.company || ''}"></div>
+                                 <div class="col-md-6"><label class="form-label">Región</label><select name="region" class="form-select" onchange="window.updateComunaOptions(this.value, this.form.comuna)">${getRegionOptions(client.region)}</select></div>
+                                 <div class="col-md-6"><label class="form-label">Comuna</label><select name="comuna" class="form-select">${getComunaOptions(client.region, client.comuna)}</select></div>
+                                 <div class="col-12"><label class="form-label">Calle y número</label><input type="text" name="street" class="form-control" value="${client.street || ''}" required></div>
+                             </div>
+                             <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Guardar</button></div>
+                         </form>`;
+                } else if (type === 'warehouse') {
+                    const warehouse = id ? db.warehouses.find(w => w.id === id) : {};
+                    title = id ? 'Editar bodega' : 'Nueva bodega';
+                    html = `
+                        <form id="warehouse-form" data-id="${warehouse.id || ''}">
+                            <div class="row g-3">
+                                <div class="col-12"><label class="form-label">Nombre</label><input type="text" name="name" class="form-control" value="${warehouse.name || ''}" required></div>
+                                <div class="col-md-6"><label class="form-label">Región</label><select name="region" class="form-select" onchange="window.updateComunaOptions(this.value, this.form.comuna)">${getRegionOptions(warehouse.region)}</select></div>
+                                <div class="col-md-6"><label class="form-label">Comuna</label><select name="comuna" class="form-select">${getComunaOptions(warehouse.region, warehouse.comuna)}</select></div>
+                                <div class="col-12"><label class="form-label">Calle y número</label><input type="text" name="street" class="form-control" value="${warehouse.street || ''}" required></div>
+                            </div>
+                            <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Guardar</button></div>
+                        </form>`;
+                }
+                
+                modalLabel.textContent = title;
+                modalBody.innerHTML = html;
+                formModal.show();
+            }
+
+            function handleFormSubmit(e) {
+                e.preventDefault();
+                const form = e.target;
+                if (!form.checkValidity()) { form.reportValidity(); return; }
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                const id = form.dataset.id ? parseInt(form.dataset.id) : null;
+
+                if (form.id === 'asset-form') {
+                    if (id) {
+                        const index = db.assets.findIndex(a => a.id === id);
+                        if (index !== -1) db.assets[index] = { ...db.assets[index], ...data };
+                    } else {
+                        const newId = (db.assets.length > 0 ? Math.max(...db.assets.map(a => a.id)) : 0) + 1;
+                        const bodega = db.warehouses.find(w => w.id === parseInt(data.bodegaId));
+                        if (bodega) db.assets.push({ id: newId, ...data, estadoAsignacion: 'Disponible', clienteId: null, region: bodega.region, comuna: bodega.comuna, street: bodega.street, lat: -33.45 + (Math.random()-0.5)*0.1, lng: -70.66 + (Math.random()-0.5)*0.1 });
+                    }
+                } else if(form.id === 'client-form') {
+                    if (id) {
+                        const index = db.clients.findIndex(c => c.id === id);
+                        if (index !== -1) db.clients[index] = { ...db.clients[index], ...data, id };
+                    } else {
+                        const newId = (db.clients.length > 0 ? Math.max(...db.clients.map(c => c.id)) : 0) + 1;
+                        db.clients.push({ id: newId, ...data });
+                    }
+                } else if(form.id === 'warehouse-form') {
+                     if (id) {
+                        const index = db.warehouses.findIndex(w => w.id === id);
+                         if (index !== -1) db.warehouses[index] = { ...db.warehouses[index], ...data, id };
+                    } else {
+                        const newId = (db.warehouses.length > 0 ? Math.max(...db.warehouses.map(w => w.id)) : 0) + 1;
+                        db.warehouses.push({ id: newId, ...data });
+                    }
+                }
+                
+                formModal.hide();
                 refreshAll();
-                input.value = '';
-            }
-        });
-        
-        const assignForm = document.getElementById('assignment-form');
-        const assignButton = document.getElementById('assignButton');
-        assignForm.addEventListener('change', () => { assignButton.disabled = !assignForm.checkValidity(); });
-        assignForm.addEventListener('submit', e => {
-            e.preventDefault();
-            if (!assignForm.checkValidity()) return;
-            
-            const assetId = parseInt(document.getElementById('assign-assetId').value);
-            const clienteId = parseInt(document.getElementById('assign-clienteId').value);
-            const asset = db.assets.find(a => a.id === assetId);
-            const client = db.clients.find(c => c.id === clienteId);
-            if (asset && client) {
-                asset.clienteId = clienteId;
-                asset.estadoAsignacion = 'Asignado';
-                asset.region = client.region;
-                asset.comuna = client.comuna;
-                asset.street = client.street;
-                asset.lat = -33.45 + (Math.random() - 0.5) * 0.1;
-                asset.lng = -70.66 + (Math.random() - 0.5) * 0.1;
-            }
-            alert('¡Activo asignado exitosamente!');
-            assignForm.reset();
-            assignButton.disabled = true;
-            refreshAll();
-        });
-
-        document.body.addEventListener('click', e => {
-            const target = e.target.closest('button');
-            if (!target) return;
-            
-            const id = parseInt(target.dataset.id);
-
-            if (target.matches('.btn-edit-asset')) showFormModal('asset', id);
-            if (target.matches('.btn-delete-asset')) {
-                if (confirm('¿Estás seguro de que quieres eliminar este activo?')) {
-                    db.assets = db.assets.filter(a => a.id !== id);
-                    refreshAll();
-                }
-            }
-            if (target.matches('.btn-return-asset')) {
-                const asset = db.assets.find(a => a.id === id);
-                const returnModalBody = document.getElementById('returnModalBody');
-                returnModalBody.innerHTML = `
-                    <p>Vas a registrar la devolución del activo <strong>${asset.code}</strong>.</p>
-                    <form id="return-form" data-id="${id}">
-                        <div class="mb-3"><label class="form-label">Devolver a bodega:</label><select name="bodegaId" class="form-select" required>${db.warehouses.map(w => `<option value="${w.id}">${w.name}</option>`).join('')}</select></div>
-                        <div class="mb-3"><label class="form-label">Estado físico al devolver:</label><select name="estadoFisico" class="form-select" required>${db.estadosFisicos.map(e => `<option value="${e}">${e}</option>`).join('')}</select></div>
-                        <div class="d-flex justify-content-end mt-4"><button type="submit" class="btn btn-primary">Confirmar Devolución</button></div>
-                    </form>`;
-                returnModal.show();
-            }
-
-            if (target.matches('.btn-edit-client')) showFormModal('client', id);
-            if (target.matches('.btn-delete-client')) {
-                if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
-                    db.clients = db.clients.filter(c => c.id !== id);
-                    refreshAll();
-                }
-            }
-
-            if (target.matches('.btn-edit-warehouse')) showFormModal('warehouse', id);
-            if (target.matches('.btn-delete-warehouse')) {
-                 if (confirm('¿Estás seguro de que quieres eliminar esta bodega?')) {
-                    db.warehouses = db.warehouses.filter(w => w.id !== id);
-                    refreshAll();
-                }
             }
             
-            if (target.matches('.btn-delete-category')) {
-                if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
-                    db.categories = db.categories.filter(c => c.id !== id);
-                    refreshAll();
-                }
+            function refreshAll() {
+                renderAssets();
+                renderClients();
+                renderWarehouses();
+                renderCategories();
+                populateFilters();
+                populateAssignmentDropdowns();
             }
-        });
 
-        document.getElementById('formModalBody').addEventListener('submit', handleFormSubmit);
-        document.getElementById('returnModalBody').addEventListener('submit', e => {
-            e.preventDefault();
-            const form = e.target;
-            const assetId = parseInt(form.dataset.id);
-            const bodegaId = parseInt(form.bodegaId.value);
-            const estadoFisico = form.estadoFisico.value;
-            const asset = db.assets.find(a => a.id === assetId);
-            const bodega = db.warehouses.find(w => w.id === bodegaId);
-            if (asset && bodega) {
-                asset.clienteId = null;
-                asset.estadoAsignacion = 'Disponible';
-                asset.estadoFisico = estadoFisico;
-                asset.region = bodega.region;
-                asset.comuna = bodega.comuna;
-                asset.street = bodega.street;
+            function populateAssignmentDropdowns() {
+                const assetSelect = document.getElementById('assign-assetId');
+                assetSelect.innerHTML = '<option value="">--</option>';
+                db.assets.filter(a => a.estadoAsignacion === 'Disponible').sort((a,b) => a.code.localeCompare(b.code)).forEach(a => assetSelect.add(new Option(`${a.code} (${a.category})`, a.id)));
+                const clientSelect = document.getElementById('assign-clienteId');
+                clientSelect.innerHTML = '<option value="">--</option>';
+                db.clients.sort((a,b) => a.lastName.localeCompare(b.lastName)).forEach(c => clientSelect.add(new Option(`${c.lastName}, ${c.name} (${c.company || 'N/A'})`, c.id)));
             }
-            returnModal.hide();
-            refreshAll();
+
+            function setupEventListeners() {
+                document.getElementById('apply-filters-btn').addEventListener('click', applyFilters);
+                document.getElementById('filter-region').addEventListener('change', (e) => {
+                    const comunaSelect = document.getElementById('filter-comuna');
+                    comunaSelect.innerHTML = '<option value="">Todas</option>';
+                    comunaSelect.disabled = !e.target.value;
+                    if (e.target.value && db.geographicalData[e.target.value]) {
+                        db.geographicalData[e.target.value].sort().forEach(comuna => comunaSelect.add(new Option(comuna, comuna)));
+                    }
+                });
+                document.getElementById('add-asset-btn').addEventListener('click', () => showFormModal('asset'));
+                document.getElementById('add-client-btn').addEventListener('click', () => showFormModal('client'));
+                document.getElementById('add-warehouse-btn').addEventListener('click', () => showFormModal('warehouse'));
+                document.getElementById('category-form').addEventListener('submit', e => {
+                    e.preventDefault();
+                    const input = document.getElementById('new-category-name');
+                    const newName = input.value.trim();
+                    if (newName && !db.categories.some(c => c.name.toLowerCase() === newName.toLowerCase())) {
+                        const newId = (db.categories.length > 0 ? Math.max(...db.categories.map(c => c.id)) : 0) + 1;
+                        db.categories.push({ id: newId, name: newName });
+                        refreshAll(); input.value = '';
+                    }
+                });
+                const assignForm = document.getElementById('assignment-form');
+                const assignButton = document.getElementById('assignButton');
+                assignForm.addEventListener('change', () => { assignButton.disabled = !assignForm.checkValidity(); });
+                assignForm.addEventListener('submit', e => {
+                    e.preventDefault();
+                    if (!assignForm.checkValidity()) return;
+                    const assetId = parseInt(document.getElementById('assign-assetId').value);
+                    const clienteId = parseInt(document.getElementById('assign-clienteId').value);
+                    const asset = db.assets.find(a => a.id === assetId);
+                    const client = db.clients.find(c => c.id === clienteId);
+                    if (asset && client) {
+                        asset.clienteId = clienteId; asset.estadoAsignacion = 'Asignado';
+                        asset.region = client.region; asset.comuna = client.comuna; asset.street = client.street;
+                        asset.lat = -33.45 + (Math.random()-0.5)*0.1; asset.lng = -70.66 + (Math.random()-0.5)*0.1;
+                    }
+                    alert('¡Activo asignado!'); assignForm.reset(); assignButton.disabled = true; refreshAll();
+                });
+                document.body.addEventListener('click', e => {
+                    const target = e.target.closest('button');
+                    if (!target) return;
+                    const id = parseInt(target.dataset.id);
+                    if (target.matches('.btn-edit-asset')) showFormModal('asset', id);
+                    if (target.matches('.btn-delete-asset')) { if (confirm('Eliminar activo?')) { db.assets = db.assets.filter(a => a.id !== id); refreshAll(); } }
+                    if (target.matches('.btn-return-asset')) {
+                        const asset = db.assets.find(a => a.id === id);
+                        document.getElementById('returnModalBody').innerHTML = `<p>Devolver <strong>${asset.code}</strong>.</p><form id="return-form" data-id="${id}"><div class="mb-3"><label>Bodega:</label><select name="bodegaId" required>${db.warehouses.map(w => `<option value="${w.id}">${w.name}</option>`).join('')}</select></div><div class="mb-3"><label>Estado físico:</label><select name="estadoFisico" required>${db.estadosFisicos.map(e => `<option value="${e}">${e}</option>`).join('')}</select></div><button type="submit">Confirmar</button></form>`;
+                        returnModal.show();
+                    }
+                    if (target.matches('.btn-edit-client')) showFormModal('client', id);
+                    if (target.matches('.btn-delete-client')) { if (confirm('Eliminar cliente?')) { db.clients = db.clients.filter(c => c.id !== id); refreshAll(); } }
+                    if (target.matches('.btn-edit-warehouse')) showFormModal('warehouse', id);
+                    if (target.matches('.btn-delete-warehouse')) { if (confirm('Eliminar bodega?')) { db.warehouses = db.warehouses.filter(w => w.id !== id); refreshAll(); } }
+                    if (target.matches('.btn-delete-category')) { if (confirm('Eliminar categoría?')) { db.categories = db.categories.filter(c => c.id !== id); refreshAll(); } }
+                });
+                document.getElementById('formModalBody').addEventListener('submit', handleFormSubmit);
+                document.getElementById('returnModalBody').addEventListener('submit', e => {
+                    e.preventDefault(); const form = e.target; const assetId = parseInt(form.dataset.id);
+                    const bodegaId = parseInt(form.bodegaId.value); const estadoFisico = form.estadoFisico.value;
+                    const asset = db.assets.find(a => a.id === assetId); const bodega = db.warehouses.find(w => w.id === bodegaId);
+                    if (asset && bodega) {
+                        asset.clienteId = null; asset.estadoAsignacion = 'Disponible'; asset.estadoFisico = estadoFisico;
+                        asset.region = bodega.region; asset.comuna = bodega.comuna; asset.street = bodega.street;
+                    }
+                    returnModal.hide(); refreshAll();
+                });
+            }
+
+            function initDemo() {
+                initMap();
+                populateFilters();
+                refreshAll();
+                setupEventListeners();
+                initTour();
+            }
+
+            initDemo();
         });
-    }
-
-    function initTour() {
-        const tour = new Shepherd.Tour({ useModalOverlay: true, defaultStepOptions: { classes: 'shadow-md bg-dark', scrollTo: true } });
-        tour.addStep({ id: 'step-1', title: '¡Bienvenido a la Demo!', text: 'Este es el Panel General. Aquí puedes ver un resumen de todos tus activos en la tabla y en el mapa. Haz clic en "Siguiente" para continuar.', attachTo: { element: '#panel-tab', on: 'bottom' } });
-        tour.addStep({ id: 'step-2', title: 'Filtra tu Información', text: 'Usa estos filtros para encontrar activos específicos. Puedes buscar por ubicación, categoría o estado. Prueba a filtrar y luego haz clic en "Siguiente".', attachTo: { element: '#filters-section', on: 'bottom' } });
-        tour.addStep({ id: 'step-3', title: 'Tabla de Activos', text: 'Aquí ves la lista detallada de tus activos. Desde aquí puedes editarlos, eliminarlos o registrar su devolución.', attachTo: { element: '#table-section', on: 'right' } });
-        tour.addStep({ id: 'step-4', title: 'Mapa Interactivo', text: 'El mapa te muestra la ubicación geográfica de los activos filtrados. Los colores de los puntos indican su estado físico.', attachTo: { element: '#map-section', on: 'left' } });
-        tour.addStep({ id: 'step-5', title: 'Asignación de Activos', text: 'Vamos a la pestaña de Asignación. Aquí es donde puedes entregar un activo a un cliente.', attachTo: { element: '#asignacion-tab', on: 'bottom' }, beforeShowPromise: () => new Promise(r => { document.getElementById('asignacion-tab').click(); setTimeout(r, 300); }) });
-        tour.addStep({ id: 'step-6', title: 'Formulario de Asignación', text: 'Simplemente selecciona un activo disponible, un cliente, acepta los términos y confirma. ¡Así de fácil!', attachTo: { element: '#assignment-form', on: 'top' } });
-        tour.addStep({ id: 'step-7', title: 'Gestión de Entidades', text: 'En las siguientes pestañas puedes administrar tus Clientes, Bodegas y Categorías. ¡Explóralas!', attachTo: { element: '#clientes-tab', on: 'bottom' }, beforeShowPromise: () => new Promise(r => { document.getElementById('clientes-tab').click(); setTimeout(r, 300); }) });
-        tour.addStep({ id: 'step-8', title: 'Fin del Tour', text: '¡Gracias por explorar la demo! Ahora puedes interactuar libremente con la plataforma.', buttons: [{ text: 'Finalizar', action: tour.complete }] });
-        document.getElementById('start-tour-btn').addEventListener('click', () => { document.getElementById('panel-tab').click(); setTimeout(() => tour.start(), 300); });
-    }
-
-    function initDemo() {
-        initMap();
-        populateFilters();
-        refreshAll();
-        setupEventListeners();
-        initTour();
-    }
-
-    initDemo();
-});
-</script>
-
-<script src="/_framework/aspnetcore-browser-refresh.js"></script></body>
+    </script>
+</body>
 </html>
+
